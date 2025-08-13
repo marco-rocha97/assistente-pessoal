@@ -172,6 +172,4 @@ Este workflow é totalmente customizável! Algumas ideias para melhorar:
 
 ---
 
-*Feito com ❤️ e muito café usando n8n, OpenAI e uma pitada de automação inteligente*
-
 **⭐ Se este workflow te ajudou, considere dar uma estrela no repositório!**
