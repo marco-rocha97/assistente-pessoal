@@ -1,0 +1,1093 @@
+{
+  "name": "Assistente de Conteúdo",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        16
+      ],
+      "id": "5172da2c-5a15-41bb-9a61-d32e0458104c",
+      "name": "Telegram Trigger",
+      "webhookId": "f65149dc-578a-4e51-bc40-0b91fc5aeca4",
+      "credentials": {
+        "telegramApi": {
+          "id": "lWL7Fx28ZwwiAGap",
+          "name": "Personal Assistant"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "numero",
+              "value": "={{ $('Set Data').item.json.message.chat_id }}"
+            },
+            {
+              "key": "mensagem",
+              "value": "={{ $('Set Data').item.json.message.content }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1,
+      "position": [
+        448,
+        16
+      ],
+      "id": "d4050e8b-ff5b-4f75-bcaa-2f063996f76b",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8f16b1bf-1a3e-4029-8d7a-1bccb919ee43",
+              "name": "message.message_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.message_id || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "60e45f30-76ae-469b-a907-63f1a08f3325",
+              "name": "message.user_name",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.first_name }} {{ $json.message.chat.last_name }}",
+              "type": "string"
+            },
+            {
+              "id": "11800d83-ecca-4f9c-a878-a2419db0c8e9",
+              "name": "message.chat_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "06eba1c9-cff0-4f68-b6da-6bb0092466b7",
+              "name": "message.content",
+              "value": "={{ $('Telegram Trigger').item.json.message?.text || $('Telegram Trigger').item.json.message?.voice?.file_id || $('Telegram Trigger').item.json.message?.photo[0]?.file_id || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "b97f1af3-5361-46fc-9303-d644921231d8",
+              "name": "message.timestamp",
+              "value": "={{ $('Telegram Trigger').item.json.message.date.toDateTime('s').toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "5d9be050-e85f-4404-b471-cbe4c16017e2",
+              "name": "message.is_bot",
+              "value": "={{ $('Telegram Trigger').item.json.message.from.is_bot }}",
+              "type": "string"
+            },
+            {
+              "id": "0acf95d7-73df-47c1-8ade-39bf1b99cf82",
+              "name": "message.message_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.message_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c251b7cf-b41b-480e-977a-98726b4a7f45",
+      "name": "Set Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5561cc4d-4721-42de-a01b-b7f8c90dcce8",
+              "leftValue": "={{ $('Set Data').item.json.message.is_bot }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        16
+      ],
+      "id": "27179295-5af1-4f61-9fd5-bd258bdab20b",
+      "name": "Filter Human Messages"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "9f463373-d591-4326-aa13-ba36ff240910"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f15e54ad-4700-46e9-bb39-4ec0e10730a0",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.document.file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "document"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4c8f98cb-c5c2-42dc-b3c0-6326cbd5ae27",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "82d3b180-0d41-40bf-a385-12395105e26f",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.photo[0].file_id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        880,
+        -16
+      ],
+      "id": "43ecdd4d-d870-42a5-b6c5-2a7196eb6b00",
+      "name": "Switch Message Type"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Set Data').item.json.message.content }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        -304
+      ],
+      "id": "ea0311cc-0fbe-410a-9d5b-73721803db10",
+      "name": "Get Audio",
+      "webhookId": "699cf9cc-ee6c-474a-bed6-35d45c67d656",
+      "credentials": {
+        "telegramApi": {
+          "id": "lWL7Fx28ZwwiAGap",
+          "name": "Personal Assistant"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Set Data').item.json.message.content }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        304
+      ],
+      "id": "dd9b72d6-649f-48f2-a4e4-f2d54cc71b80",
+      "name": "Get Image",
+      "webhookId": "699cf9cc-ee6c-474a-bed6-35d45c67d656",
+      "credentials": {
+        "telegramApi": {
+          "id": "lWL7Fx28ZwwiAGap",
+          "name": "Personal Assistant"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "23079890-f077-46f8-9a68-0b27d17da521",
+      "name": "Extract File Data",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').last().json.message.document.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        -128
+      ],
+      "id": "687e111b-8e4a-4c10-a818-eac9b8823214",
+      "name": "Get Document",
+      "webhookId": "699cf9cc-ee6c-474a-bed6-35d45c67d656",
+      "credentials": {
+        "telegramApi": {
+          "id": "lWL7Fx28ZwwiAGap",
+          "name": "Personal Assistant"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c045a544-a0f5-4807-ad27-2948e5a48baa",
+              "name": "content",
+              "value": "={{ \n  $input.all().find(item => item.json.message)?.json.message ||\n  $input.all().find(item => item.json.text)?.json.text ||\n  $input.all().find(item => item.json.content)?.json.content ||\n  $input.all().find(item => item.json.metadata.text)?.json.metadata.text ||\n  ''\n}}",
+              "type": "string"
+            },
+            {
+              "id": "faa7277e-4486-428f-ab60-0ea666076bde",
+              "name": "timestamp",
+              "value": "={{ $('Set Data').item.json.message.timestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "12292505-18dd-4881-9bd3-86ce05a4c6ac",
+              "name": "message_id",
+              "value": "={{ $('Set Data').item.json.message.message_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1552,
+        0
+      ],
+      "id": "d90f9834-06ea-4f4f-a0e3-eb5637c664b1",
+      "name": "Set Message"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "id": "93dd44cd-bee5-44d4-8127-b25c8026277b",
+      "name": "Audio Transcriber",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1296,
+        -304
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "SqowEUof606PMwyJ",
+          "name": "OpenAi Teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "Descreva essa imagem, o que tem nela?",
+        "inputType": "base64",
+        "options": {}
+      },
+      "id": "5294697b-2bb3-40c4-9f1d-9651c06bed2c",
+      "name": "Image Analyzer",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1296,
+        304
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "SqowEUof606PMwyJ",
+          "name": "OpenAi Teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "496933b9-986d-45a2-9a52-612a7d9dd25f",
+              "name": "text",
+              "value": "={{ $('Set Data').item.json.message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1296,
+        80
+      ],
+      "id": "f7019ccf-5f5b-4024-83c5-4b564a69f187",
+      "name": "Text Message"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Set Data').item.json.message.chat_id }}",
+        "text": "=Conteúdo adicionado ao ClickUp:\n{{ $('Content Agent').item.json.output.title }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3728,
+        -16
+      ],
+      "id": "9397a986-59d0-4f90-96c6-9c44afef59d5",
+      "name": "Answer",
+      "webhookId": "2b56eaf9-e265-4196-b652-94c0bbb279b9",
+      "credentials": {
+        "telegramApi": {
+          "id": "lWL7Fx28ZwwiAGap",
+          "name": "Personal Assistant"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Buffer de Memória",
+        "height": 700,
+        "width": 1280,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1776,
+        -304
+      ],
+      "typeVersion": 1,
+      "id": "3cd90651-0239-4d47-b595-770a367cd58f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('Set Data').item.json.message.chat_id }}_buf",
+        "messageData": "={{ JSON.stringify({\n  \"message\": $json.content,\n  \"timestamp\": $now,\n  \"message_id\": $json.message_id }) }}",
+        "tail": true
+      },
+      "id": "b152ebee-a9a0-4162-8321-d499f88307e4",
+      "name": "Push Buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "NcqWUte7YT4pi3Rz",
+          "name": "Redis Teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "messages",
+        "key": "={{ $('Set Data').item.json.message.chat_id }}_buf",
+        "options": {}
+      },
+      "id": "6457f462-115a-4277-bece-55cd29f89131",
+      "name": "Get Buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2032,
+        0
+      ],
+      "credentials": {
+        "redis": {
+          "id": "NcqWUte7YT4pi3Rz",
+          "name": "Redis Teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Set Data').item.json.message.chat_id }}_buf"
+      },
+      "id": "197fac55-0ad5-4d71-9a76-992cf24a5d57",
+      "name": "Delete Buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        -16
+      ],
+      "credentials": {
+        "redis": {
+          "id": "NcqWUte7YT4pi3Rz",
+          "name": "Redis Teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "db5cfe0a-7f43-4a61-8b27-bfd3a95deb8d",
+              "name": "messages",
+              "value": "={{ $('Get Buffer').item.json.messages.map(buffer => JSON.parse(buffer).message).join('\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b76b5baa-23a0-45a2-9631-8e3b5c7f9262",
+      "name": "Set Messages",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2688,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($('Get Buffer').item.json.messages.first()).message_id }}",
+                    "rightValue": "={{ $('Set Data').item.json.message.message_id }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    },
+                    "id": "b853a0cf-caf6-4508-8b33-aa785a15aaa1"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "faz nada"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1585bc24-0b58-4179-8919-0e9aabc0e35e",
+                    "leftValue": "={{ JSON.parse($('Get Buffer').item.json.messages.last()).timestamp }}",
+                    "rightValue": "={{ $now.minus(15.'seconds') }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "before"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "prosseguir"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "esperar"
+        }
+      },
+      "id": "ffd12774-1523-4dec-917f-d73053855b97",
+      "name": "Switch Buffer",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2256,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "function limparMensagem(texto) {\n  if (typeof texto !== 'string') {\n    return '';\n  }\n\n  // Função para remover metadados e dados técnicos\n  function removerMetadataTecnico(str) {\n    return str\n      // Remove objetos e chaves de metadados específicos\n      .replace(/\"response_metadata\"\\s*:\\s*{[^}]*}/g, '')  // Remove \"response_metadata\"\n      .replace(/\"additional_kwargs\"\\s*:\\s*{[^}]*}/g, '')  // Remove \"additional_kwargs\"\n      .replace(/\"tool_calls\"\\s*:\\s*\\[\\s*\\]/g, '')  // Remove \"tool_calls\" vazio\n      .replace(/\"invalid_tool_calls\"\\s*:\\s*\\[\\s*\\]/g, '')  // Remove \"invalid_tool_calls\" vazio\n      .replace(/\"type\"\\s*:\\s*\"(ai|human)\"/g, '')  // Remove os tipos \"ai\" e \"human\"\n      .replace(/\"data\"\\s*:\\s*{[^}]*}/g, '')  // Remove a chave \"data\"\n      // Remove objetos JSON em excesso ou vazios\n      .replace(/,\\s*{[^}]*}/g, '') // Remove objetos soltos\n      .replace(/,\\s*\\[\\s*\\]/g, '') // Remove arrays vazios\n      .replace(/\\s*:\\s*null/g, '') // Remove valores null\n      .replace(/\\s*:\\s*\\[\\]/g, '') // Remove arrays vazios\n      .replace(/\\s*:\\s*{}/g, '') // Remove objetos vazios\n      // Ajusta espaços desnecessários\n      .replace(/\\s+/g, ' ')\n      .replace(/^\\s+|\\s+$/g, '');  // Remove espaços no início e fim\n  }\n\n  // Função para limpar caracteres especiais\n  function limparCaracteresEspeciais(str) {\n    return str\n      .replace(/\\\\\\\\[rnt]/g, ' ')  // Limpa sequências de escape\n      .replace(/\\\\\\\\\\\"/g, '')  // Remove as aspas escapadas\n      .replace(/\\\\\\\\\\\\\\\\/g, '')  // Remove barras invertidas\n      .replace(/[\\x00-\\x1F\\x7F-\\x9F]/g, '')  // Remove caracteres de controle\n      .replace(/\\\"+/g, '')  // Remove aspas extras\n      .replace(/[{}[\\]]/g, '')  // Remove chaves e colchetes extras\n      .trim();\n  }\n\n  // Função para extrair e limpar a mensagem principal\n  function extrairMensagemPrincipal(str) {\n    // Divide em frases, removendo pontuação extra\n    const frases = str.split(/(?<=[.!?])\\s+/);\n\n    return frases\n      .map(frase => frase.trim())\n      .filter(frase => {\n        // Remove frases que ainda têm metadados ou são irrelevantes\n        return frase.length > 0 &&\n          !frase.includes('tool_calls') &&\n          !frase.includes('invalid_tool_calls') &&\n          !frase.match(/^[:\\s\\[\\]{}]+$/);\n      })\n      .join(' ');\n  }\n\n  // Processo de limpeza e extração\n  let resultado = texto;\n\n  // Passo 1: Remove metadados e chaves indesejadas\n  resultado = removerMetadataTecnico(resultado);\n\n  // Passo 2: Extrai a mensagem relevante, ignorando o que não é necessário\n  resultado = extrairMensagemPrincipal(resultado);\n\n  // Passo 3: Remove caracteres especiais e formatação indesejada\n  resultado = limparCaracteresEspeciais(resultado);\n\n  // Limpeza final para remover espaços extras\n  resultado = resultado\n    .replace(/\\s+/g, ' ')\n    .replace(/^[\\\",\\s]+|[\\\",\\s]+$/g, '')\n    .trim();\n\n  return resultado;\n}\n\nfunction processarMensagens(items) {\n  return items.map(item => {\n    try {\n      if (!item?.json?.mensagem) {\n        return item;\n      }\n\n      let mensagem = item.json.mensagem;\n\n      // Se for objeto, converte para string\n      if (typeof mensagem === 'object') {\n        try {\n          mensagem = JSON.stringify(mensagem);\n        } catch (e) {\n          console.error('Erro ao converter objeto para string:', e);\n          return item;\n        }\n      }\n\n      // Aplica a limpeza\n      const mensagemLimpa = limparMensagem(mensagem);\n\n      // Atualiza apenas se houver conteúdo significativo\n      if (mensagemLimpa && mensagemLimpa.length > 0) {\n        item.json.mensagem = mensagemLimpa;\n      }\n\n      return { json: item.json };\n    } catch (error) {\n      console.error('Erro ao processar item:', error);\n      return item;\n    }\n  });\n}\n\n// Execução principal\ntry {\n  const items = $input.all();\n  return processarMensagens(items);\n} catch (error) {\n  console.error('Erro na execução:', error);\n  throw error;\n}\n"
+      },
+      "id": "8d25b0f7-9ead-433d-96a8-e9364323850f",
+      "name": "Clean Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2912,
+        -16
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "8d2ff48b-e38e-48b2-9c9e-662d1ec959f3",
+      "name": "Wait 5 Seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2480,
+        160
+      ],
+      "webhookId": "01625d84-6888-48f1-a9fc-efef1f27cddd"
+    },
+    {
+      "parameters": {
+        "content": "## Tratamento da Mensagem",
+        "height": 860,
+        "width": 892,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        848,
+        -384
+      ],
+      "typeVersion": 1,
+      "id": "b5d97b3d-292f-47fa-ab38-876e0772497c",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ (() => $('Clean Message').item.json.content ? $('Clean Message').item.json.content : $('Clean Message').item.json.text)() || $('Clean Message').item.json.messages}}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=Você é um estrategista de conteúdo especialista em redes sociais B2B com 20 anos de experiência, focado em automação e IA para PMEs. Seu objetivo é organizar rascunhos e ideias em estruturas claras de tópicos e subtópicos, adaptadas para diferentes plataformas digitais.\n\n## SEU PERFIL E EXPERTISE\n- Especialista em automação e IA para redução de custos operacionais\n- Conhece profundamente as dores de PMEs (10-50 funcionários) em crescimento\n- Domina estratégias de conteúdo para LinkedIn, YouTube, Substack e outras plataformas\n\n## ICP PRINCIPAL\n**Perfil:** Sócio-fundador/diretor (30-50 anos) de PME em crescimento com processos sobrecarregados\n**Rotina:** Manhãs reativas, agenda fragmentada, trabalho estratégico só à noite/fim de semana\n**Consumo:** LinkedIn como fonte principal, prefere conteúdo direto e acionável\n**Motivações:** Crescimento da empresa, paz de espírito, reduzir dependência pessoal na operação\n\n## PROCESSO DE ORGANIZAÇÃO\n\n### 1. ANÁLISE DO INPUT\n- Identifique a plataforma alvo mencionada (LinkedIn, YouTube, Substack, etc.)\n- Extraia a ideia central e objetivos\n- Determine o nível de complexidade do conteúdo\n\n### 2. ESTRUTURAÇÃO EM TÓPICOS\nOrganize o conteúdo seguindo esta hierarquia:\n\n**TÓPICO PRINCIPAL**\n- Subtópico 1\n  - Detalhe específico\n  - Exemplo/dado\n- Subtópico 2\n  - Detalhe específico\n  - Exemplo/dado\n\n### 3. DISTINÇÃO CLARA DE ORIGEM\nUse esta formatação obrigatória:\n\n**🔵 IDEIAS ORIGINAIS (do seu input):**\n- [Liste aqui tudo que veio diretamente do rascunho fornecido]\n- [Mantenha a linguagem e conceitos originais]\n\n**🤖 SUGESTÕES DA IA:**\n- [Complementos e melhorias propostas]\n- [Novos ângulos ou abordagens]\n- [Estruturações adicionais]\n\n### 4. ADAPTAÇÃO POR PLATAFORMA\n\n**Para LinkedIn:**\n- Foque em ganchos profissionais\n- Organize para storytelling empresarial\n- Priorize cases e números\n\n**Para YouTube:**\n- Estruture em introdução/desenvolvimento/conclusão\n- Organize pontos para roteiro\n- Inclua momentos de engajamento\n\n**Para Substack:**\n- Organize em seções de newsletter\n- Estruture para leitura aprofundada\n- Inclua pontos para desenvolvimento extenso\n\n**Para outras plataformas:**\n- Adapte conforme características específicas mencionadas\n\n### 5. ELEMENTOS OBRIGATÓRIOS NA ORGANIZAÇÃO\n\n**Gancho/Abertura:**\n🔵 Original: [extrair do input]\n🤖 Sugestões: [melhorias propostas]\n\n**Desenvolvimento:**\n🔵 Original: [pontos principais do input]\n�� Sugestões: [complementos e estruturação]\n\n**Fechamento:**\n🔵 Original: [conclusão original, se houver]\n🤖 Sugestões: [CTAs e engajamento propostos]\n\n### 6. SUGESTÕES COMPLEMENTARES\nSempre inclua uma seção final com:\n- Sugestões de imagens/visuais\n- Hashtags relevantes (se aplicável à plataforma)\n- Timing ideal de publicação\n- Variações de formato\n\n## DIRETRIZES ESPECÍFICAS\n- Mantenha a essência das ideias originais\n- Seja transparente sobre o que é sugestão vs. original\n- Adapte a linguagem para o público PME\n- Foque em praticidade e aplicabilidade\n- Preserve o tom e estilo do input original\n\n## FORMATO DE ENTREGA\n1. **Plataforma identificada:** [Nome da rede social]\n2. **Estrutura organizada** com distinção clara de origem\n3. **Sugestões complementares** específicas da plataforma\n4. **Próximos passos** para desenvolvimento do conteúdo\n\nAgora analise o rascunho fornecido, identifique a plataforma alvo e organize as ideias em uma estrutura clara e acionável."
+        }
+      },
+      "id": "63ba04ee-de64-40f4-bb31-6361fc8dd6c8",
+      "name": "Content Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        3136,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3168,
+        192
+      ],
+      "id": "f9f95a4c-17e5-45df-8cbf-9991d3a2fe7a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "SqowEUof606PMwyJ",
+          "name": "OpenAi Teste"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "team": "90131198223",
+        "space": "90135993452",
+        "folderless": true,
+        "list": "901312655151",
+        "name": "={{ $('Content Agent').item.json.output.title }}",
+        "additionalFields": {
+          "content": "={{ $('Content Agent').item.json.output.content }}"
+        }
+      },
+      "type": "n8n-nodes-base.clickUp",
+      "typeVersion": 1,
+      "position": [
+        3520,
+        -16
+      ],
+      "id": "a76a2dc8-53b7-4419-819e-e74ee7153820",
+      "name": "Create Task",
+      "credentials": {
+        "clickUpOAuth2Api": {
+          "id": "Ok3dawf1Vm9JGiFr",
+          "name": "ClickUp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"title\": \"titulo\",\n\t\"content\": \"conteúdo\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        3328,
+        192
+      ],
+      "id": "c42bc05e-a0f1-45bf-8111-053dc55867f1",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {},
+      "id": "c7e0eeb0-2ff9-443f-87ed-0d4235b83448",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2480,
+        -208
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Data": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execution Data": {
+      "main": [
+        [
+          {
+            "node": "Filter Human Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Human Messages": {
+      "main": [
+        [
+          {
+            "node": "Switch Message Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Message Type": {
+      "main": [
+        [
+          {
+            "node": "Get Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Document",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Text Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Audio": {
+      "main": [
+        [
+          {
+            "node": "Audio Transcriber",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image": {
+      "main": [
+        [
+          {
+            "node": "Image Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Document": {
+      "main": [
+        [
+          {
+            "node": "Extract File Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract File Data": {
+      "main": [
+        [
+          {
+            "node": "Set Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio Transcriber": {
+      "main": [
+        [
+          {
+            "node": "Set Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Set Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Message": {
+      "main": [
+        [
+          {
+            "node": "Set Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message": {
+      "main": [
+        [
+          {
+            "node": "Push Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push Buffer": {
+      "main": [
+        [
+          {
+            "node": "Get Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Buffer": {
+      "main": [
+        [
+          {
+            "node": "Switch Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Buffer": {
+      "main": [
+        [
+          {
+            "node": "Set Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Messages": {
+      "main": [
+        [
+          {
+            "node": "Clean Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Buffer": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 5 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 Seconds": {
+      "main": [
+        [
+          {
+            "node": "Get Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Message": {
+      "main": [
+        [
+          {
+            "node": "Content Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Agent": {
+      "main": [
+        [
+          {
+            "node": "Create Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Task": {
+      "main": [
+        [
+          {
+            "node": "Answer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Content Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "da574a7f-2bf6-4f2f-be83-e3bc41569f43",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1344b844806ede759e5c47d21e1731d619e5a2ae399c3dd0273b0843a2c6fc68"
+  },
+  "id": "yC3v5MeMeyHzBORs",
+  "tags": []
+}
