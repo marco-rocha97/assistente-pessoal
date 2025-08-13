@@ -1,6 +1,6 @@
 # Assistente de Conteúdo Inteligente 🤖
 
-> Uma automação que transforma suas ideias soltas do Telegram em conteúdo estruturado e organizado automaticamente no ClickUp
+> Uma automação que transforma suas ideias soltas em conteúdo estruturado e organizado automaticamente no ClickUp
 
 ![Badge](https://img.shields.io/badge/n8n-Automation-FF6D5A?style=flat-square&logo=n8n)
 ![Badge](https://img.shields.io/badge/Telegram-Bot-26A5E4?style=flat-square&logo=telegram)
