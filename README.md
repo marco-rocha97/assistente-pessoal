@@ -11,7 +11,7 @@
 
 ## 🎯 O que essa automação faz?
 
-Sabe quando você tem uma ideia genial no meio do dia e manda uma mensagem rápida no Telegram? 
+Sabe quando você tem uma ideia genial no meio do dia e precisa anotar em algum lugar? 
 Esta automação pega essas suas ideias "bagunçadas" e transforma em conteúdo profissional e estruturado automaticamente!
 
 Você pode enviar **qualquer tipo de conteúdo** - texto, áudio, imagem ou documento - e a IA organiza tudo em tópicos claros, adaptados para diferentes redes sociais, criando uma tarefa completa no seu ClickUp.
@@ -92,43 +92,6 @@ Você pode enviar **qualquer tipo de conteúdo** - texto, áudio, imagem ou docu
 3. Verifique se a tarefa foi criada no ClickUp
 4. Ajuste configurações se necessário
 
-## ⚙️ Configurações importantes
-
-### 🕐 Sistema de Buffer
-- **Tempo de espera:** 15 segundos após última mensagem
-- **Finalidade:** Permite enviar múltiplas mensagens que serão processadas juntas
-- **Exemplo:** Envie texto + foto + áudio em sequência
-
-### 🎨 Personalização do Prompt
-O prompt atual está otimizado para:
-- Consultores e PMEs
-- Conteúdo B2B para LinkedIn
-- Foco em automação e eficiência
-
-**Para adaptar para seu nicho:**
-1. Modifique a seção "SEU PERFIL E EXPERTISE"
-2. Ajuste o "ICP PRINCIPAL" para seu público
-3. Personalize exemplos e linguagem
-
-### 🔄 Tipos de mídia suportados
-- **Texto:** Processamento direto
-- **Áudio:** Transcrição automática via OpenAI Whisper
-- **Imagens:** Análise e descrição via GPT-4 Vision
-- **PDFs:** Extração de texto automática
-
-## 🔒 Cuidados com segurança
-
-### 🛡️ Proteções implementadas
-- **Filtro anti-loop:** Impede que respostas do bot reativem o workflow
-- **Validação de usuários:** Apenas mensagens humanas são processadas
-- **Buffer seguro:** Dados temporários no Redis com expiração automática
-
-### ⚠️ Recomendações adicionais
-- Mantenha suas API keys seguras e privadas
-- Configure rate limiting no Telegram se necessário
-- Monitore uso das APIs para controlar custos
-- Considere adicionar lista de usuários autorizados
-
 ## 🤝 Quer contribuir ou adaptar?
 
 Este workflow é totalmente customizável! Algumas ideias para melhorar:
@@ -137,7 +100,6 @@ Este workflow é totalmente customizável! Algumas ideias para melhorar:
 - 🎯 Criar templates específicos por nicho
 - 📱 Expandir para WhatsApp ou Discord
 - 🤖 Adicionar mais modelos de IA
-- 📊 Implementar analytics avançados
 
 **Dicas para personalização:**
 1. Fork este workflow como base
@@ -163,12 +125,6 @@ Este workflow é totalmente customizável! Algumas ideias para melhorar:
 - Confirme IDs do workspace/lista
 - Verifique permissões OAuth2
 - Valide estrutura dos dados
-
-### 📞 Suporte
-- Consulte documentação oficial do n8n
-- Verifique logs detalhados de execução
-- Teste componentes individualmente
-- Use modo debug para análise profunda
 
 ---
 
